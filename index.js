@@ -60,7 +60,7 @@ app.post("/leads", async (req, res) => {
     }
 
     const newLead = await createLead(req.body);
-    res.status(201).json({ message: "New Lead Added" });
+    res.status(201).json({ message: "New Lead Added",newLead });
   } catch (err) {
     if (err.name === "ValidationError") {
       const messages = Object.values(err.errors).map((er) => {
@@ -96,7 +96,7 @@ const createSalesAgent = async (salesAgentData) => {
 app.post("/agents", async (req, res) => {
   try {
     const createdAgent = await createSalesAgent(req.body);
-    res.status(201).json({ message: "New Sales Agent Data Added." });
+    res.status(201).json({ message: "New Sales Agent Data Added.", createdAgent });
 
   } catch (err) {
     if (err.name === "ValidationError") {
