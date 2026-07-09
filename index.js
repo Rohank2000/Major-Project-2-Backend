@@ -60,7 +60,7 @@ app.post("/leads", async (req, res) => {
     }
 
     const newLead = await createLead(req.body);
-    res.status(201).json({ message: "New Lead Added",newLead });
+    res.status(201).json({ message: "New Lead Added", newLead });
   } catch (err) {
     if (err.name === "ValidationError") {
       const messages = Object.values(err.errors).map((er) => {
@@ -96,8 +96,9 @@ const createSalesAgent = async (salesAgentData) => {
 app.post("/agents", async (req, res) => {
   try {
     const createdAgent = await createSalesAgent(req.body);
-    res.status(201).json({ message: "New Sales Agent Data Added.", createdAgent });
-
+    res
+      .status(201)
+      .json({ message: "New Sales Agent Data Added.", createdAgent });
   } catch (err) {
     if (err.name === "ValidationError") {
       const messages = Object.values(err.errors).map(
@@ -112,7 +113,34 @@ app.post("/agents", async (req, res) => {
       res.status(500).json({ error: err.message });
     }
   }
+});
 
+//get sales agent data through mongoose
+
+const getAllAgents = async () => {
+  try {
+    const agentList = await salesAgentModel.find();
+    return agentList;
+  } catch (error) {
+    console.error("error", error.message);
+    throw error;
+  }
+};
+
+//get sales agent data using express api
+
+app.get("/agents", async (req, res) => {
+  try {
+   const allAgents = await getAllAgents();
+    if (!allAgents || allAgents.length === 0) {
+      return res.status(404).json({ message: "Sales agent Data not found." });
+    }
+    res
+      .status(200)
+      .json({ message: "All Sales Agent Data Successfully Fetched." });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 const PORT = process.env.PORT || 3000;
