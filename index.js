@@ -61,7 +61,6 @@ app.post("/leads", async (req, res) => {
 
     const newLead = await createLead(req.body);
     res.status(201).json({ message: "New Lead Added" });
-
   } catch (err) {
     if (err.name === "ValidationError") {
       const messages = Object.values(err.errors).map((er) => {
@@ -79,8 +78,45 @@ app.post("/leads", async (req, res) => {
   }
 });
 
-PORT = 3000 | 10000;
+// adding Sales Agent Data through Mongoose
 
-app.listen(PORT, ()=>{
+const createSalesAgent = async (salesAgentData) => {
+  try {
+    const newAgent = new salesAgentModel(salesAgentData);
+    const savedAgent = await newAgent.save();
+    return savedAgent;
+  } catch (error) {
+    console.error("Error", error.message);
+    throw error;
+  }
+};
+
+// adding Sales Agent Data using Express Api
+
+app.post("/agents", async (req, res) => {
+  try {
+    const createdAgent = await createSalesAgent(req.body);
+    res.status(201).json({ message: "New Sales Agent Data Added." });
+
+  } catch (err) {
+    if (err.name === "ValidationError") {
+      const messages = Object.values(err.errors).map(
+        (er) => `'${er.path}' ${er.message.toLowerCase()}`
+      );
+      res.status(400).json({ error: `Invalid input: ${messages.join(", ")}` });
+    } else if (err.code === 11000) {
+      res.status(409).json({
+        error: `Sales agent with email '${req.body.email}' already exists.`,
+      });
+    } else {
+      res.status(500).json({ error: err.message });
+    }
+  }
+
+});
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
   console.log("Server running on PORT - ", PORT);
 });
