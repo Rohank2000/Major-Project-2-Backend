@@ -137,7 +137,7 @@ app.get("/agents", async (req, res) => {
     }
     res
       .status(200)
-      .json({ message: "All Sales Agent Data Successfully Fetched." });
+      .json({ message: "All Sales Agent Data Successfully Fetched.", allAgents });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
