@@ -2,6 +2,7 @@ const { getDbConnection } = require("./db/db.connect");
 
 getDbConnection();
 
+const mongoose = require("mongoose");
 const express = require("express");
 
 const app = express();
@@ -78,6 +79,114 @@ app.post("/leads", async (req, res) => {
   }
 });
 
+//get leads data using mongoose
+
+const getAllLeads = async (queryParameter) => {
+  try {
+    const { tags, ...standardFields } = queryParameter;
+
+    const filter = Object.fromEntries(
+      Object.entries(standardFields).filter(
+        ([key, value]) => value !== undefined && value !== ""
+      )
+    );
+
+    if (tags) {
+      filter.tags = { $in: tags.split(", ") };
+    }
+
+    const filteredLeadsData = await leadModel
+      .find(filter)
+      .populate("salesAgent");
+    return filteredLeadsData;
+  } catch (error) {
+    console.error("Error", error.message);
+    throw error;
+  }
+};
+
+//get leads data using express api
+
+app.get("/leads", async (req, res) => {
+  try {
+    // Validation Logic for status, source, and salesAgent
+
+    const { status, source, salesAgent } = req.query;
+
+    const allowedStatuses = [
+      "New",
+      "Contacted",
+      "Qualified",
+      "Proposal Sent",
+      "Closed",
+    ];
+    const allowedSources = [
+      "Website",
+      "Referral",
+      "Cold Call",
+      "Advertisement",
+      "Email",
+      "Other",
+    ];
+
+    // Validate 'status'
+
+    if (status && !allowedStatuses.includes(status)) {
+      return res
+        .status(400)
+        .json({
+          error: `Invalid input : 'status' must be one of [${allowedStatuses.join(
+            ", "
+          )}].`,
+        });
+    }
+
+    // Validate 'source'
+
+    if (source && !allowedSources.includes(source)) {
+      return res
+        .status(400)
+        .json({
+          error: `Invalid input : 'source' must be one of [${allowedSources.join(
+            ", "
+          )}]`,
+        });
+    }
+
+    // Validate 'salesAgent'
+
+    if (salesAgent && !mongoose.Types.ObjectId.isValid(salesAgent)) {
+      return res
+        .status(400)
+        .json({
+          error:
+            "Invalid input: 'salesAgent' must be a valid MongoDB ObjectId.",
+        });
+    }
+
+    // If all validations pass, execute the database search
+
+    const lead = await getAllLeads(req.query);
+
+    if (!lead || lead.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No leads found matching the criteria." });
+    }
+
+    res.status(200).json({ message: "Leads fetched successfully.", leads: lead });
+  } catch (error) {
+    // Catch unrecognized keys
+    if (error.name === "StrictModeError") {
+      return res
+        .status(400)
+        .json({ error: `Invalid query Parameter : ${error.path}` });
+    }
+
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // adding Sales Agent Data through Mongoose
 
 const createSalesAgent = async (salesAgentData) => {
@@ -131,13 +240,14 @@ const getAllAgents = async () => {
 
 app.get("/agents", async (req, res) => {
   try {
-   const allAgents = await getAllAgents();
+    const allAgents = await getAllAgents();
     if (!allAgents || allAgents.length === 0) {
       return res.status(404).json({ message: "Sales agent Data not found." });
     }
-    res
-      .status(200)
-      .json({ message: "All Sales Agent Data Successfully Fetched.", allAgents });
+    res.status(200).json({
+      message: "All Sales Agent Data Successfully Fetched.",
+      allAgents,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

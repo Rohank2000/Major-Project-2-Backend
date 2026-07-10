@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 
 // Lead Schema
-const leadSchema = new mongoose.Schema({
+const leadSchema = new mongoose.Schema(
+  {
   name: {
     type: String,
     required: [true, 'Lead name is required'],
@@ -20,7 +21,7 @@ const leadSchema = new mongoose.Schema({
     type: String,
     required: true,
     enum: ['New', 'Contacted', 'Qualified', 'Proposal Sent', 'Closed'],  // Predefined lead statuses
-    default: 'New',
+    default: 'New', 
   },
   tags: {
     type: [String],  // Array of strings for tags (e.g., High Value, Follow-up)
@@ -47,7 +48,8 @@ const leadSchema = new mongoose.Schema({
   closedAt: {
     type: Date,  // The date when the lead was closed (optional, used when status is "Closed")
   },
-});
+},
+{ strictQuery: 'throw' });
 
 // Middleware to update the `updatedAt` field on each save
 leadSchema.pre('save', function () {
