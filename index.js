@@ -132,36 +132,29 @@ app.get("/leads", async (req, res) => {
     // Validate 'status'
 
     if (status && !allowedStatuses.includes(status)) {
-      return res
-        .status(400)
-        .json({
-          error: `Invalid input : 'status' must be one of [${allowedStatuses.join(
-            ", "
-          )}].`,
-        });
+      return res.status(400).json({
+        error: `Invalid input : 'status' must be one of [${allowedStatuses.join(
+          ", "
+        )}].`,
+      });
     }
 
     // Validate 'source'
 
     if (source && !allowedSources.includes(source)) {
-      return res
-        .status(400)
-        .json({
-          error: `Invalid input : 'source' must be one of [${allowedSources.join(
-            ", "
-          )}]`,
-        });
+      return res.status(400).json({
+        error: `Invalid input : 'source' must be one of [${allowedSources.join(
+          ", "
+        )}]`,
+      });
     }
 
     // Validate 'salesAgent'
 
     if (salesAgent && !mongoose.Types.ObjectId.isValid(salesAgent)) {
-      return res
-        .status(400)
-        .json({
-          error:
-            "Invalid input: 'salesAgent' must be a valid MongoDB ObjectId.",
-        });
+      return res.status(400).json({
+        error: "Invalid input: 'salesAgent' must be a valid MongoDB ObjectId.",
+      });
     }
 
     // If all validations pass, execute the database search
@@ -174,7 +167,9 @@ app.get("/leads", async (req, res) => {
         .json({ message: "No leads found matching the criteria." });
     }
 
-    res.status(200).json({ message: "Leads fetched successfully.", leads: lead });
+    res
+      .status(200)
+      .json({ message: "Leads fetched successfully.", leads: lead });
   } catch (error) {
     // Catch unrecognized keys
     if (error.name === "StrictModeError") {
@@ -184,6 +179,80 @@ app.get("/leads", async (req, res) => {
     }
 
     res.status(500).json({ error: error.message });
+  }
+});
+
+// Update Leads Data through Mongoose
+
+const updateLead = async (leadId, updatedLead) => {
+  try {
+    return await leadModel.findByIdAndUpdate(leadId, updatedLead, {
+      returnDocument: "after",
+      runValidators: true,
+    });
+  } catch (error) {
+    console.error("error", error.message);
+    throw error;
+  }
+};
+
+// update leads data using express api
+
+app.put("/leads/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (id && !mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Invalid Lead Id." });
+    }
+
+    if (id) {
+      const leadId = await leadModel.findById(id);
+      if (!leadId) {
+        return res
+          .status(404)
+          .json({ error: `Lead with ID '${id}' not found.` });
+      }
+    }
+
+    const { salesAgent } = req.body;
+
+    if (salesAgent && !mongoose.Types.ObjectId.isValid(salesAgent)) {
+      return res
+        .status(400)
+        .json({ error: "'salesAgent' must be a valid MongoDB ObjectId." });
+    }
+
+    if (salesAgent) {
+      const agent = await salesAgentModel.findById(salesAgent);
+      if (!agent) {
+        return res
+          .status(404)
+          .json({ error: `sales Agent with Id ${salesAgent} not found.` });
+      }
+    }
+
+    const updatedLead = await updateLead(req.params.id, req.body);
+
+    if (!updatedLead) {
+      return res.status(404).json({ error: "Lead not found." });
+    }
+
+    res.status(200).json({ message: "Lead Updated Succesfully.", updatedLead });
+  } catch (error) {
+    if (error.name === "ValidationError") {
+      const messages = Object.values(error.errors).map((er) => {
+        if (er.kind === "required") {
+          return `${er.path} is required.`;
+        }
+        return `${er.path} ${er.message.toLowerCase()}`;
+      });
+      res.status(400).json({ error: `Invalid input : ${messages.join(", ")}` });
+    } else if (error.code === 11000) {
+      res.status(409).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: error.message });
+    }
   }
 });
 
