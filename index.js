@@ -251,7 +251,7 @@ app.put("/leads/:id", async (req, res) => {
 
 const deleteLead = async (leadId) => {
   try {
-    return await leadModel.getByIdAndDelete(leadId);
+    return await leadModel.findByIdAndDelete(leadId);
   } catch (error) {
     console.error("error", error.message);
     throw error;
