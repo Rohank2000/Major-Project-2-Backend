@@ -206,15 +206,6 @@ app.put("/leads/:id", async (req, res) => {
       return res.status(400).json({ error: "Invalid Lead Id." });
     }
 
-    if (id) {
-      const leadId = await leadModel.findById(id);
-      if (!leadId) {
-        return res
-          .status(404)
-          .json({ error: `Lead with ID '${id}' not found.` });
-      }
-    }
-
     const { salesAgent } = req.body;
 
     if (salesAgent && !mongoose.Types.ObjectId.isValid(salesAgent)) {
@@ -234,8 +225,8 @@ app.put("/leads/:id", async (req, res) => {
 
     const updatedLead = await updateLead(req.params.id, req.body);
 
-    if (!updatedLead) {
-      return res.status(404).json({ error: "Lead not found." });
+    if (id || !updatedLead) {
+      return res.status(404).json({ error: `Lead with ID '${id}' not found.` });
     }
 
     res.status(200).json({ message: "Lead Updated Succesfully.", updatedLead });
@@ -253,6 +244,36 @@ app.put("/leads/:id", async (req, res) => {
     } else {
       res.status(500).json({ error: error.message });
     }
+  }
+});
+
+// Delete Lead Data using mongoose
+
+const deleteLead = async (leadId) => {
+  try {
+    return await leadModel.getByIdAndDelete(leadId);
+  } catch (error) {
+    console.error("error", error.message);
+    throw error;
+  }
+};
+
+// Delete Lead Data using express api
+
+app.delete("/leads/:id", async (req, res) => {
+  try {
+    const {id} = req.params;
+
+    if (id || !mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({error:"Invalid Lead Id."});
+    }
+    const leadDeleted = await deleteLead(req.params.id);
+    if (id || !leadDeleted) {
+      return res.status(404).json({error:`Lead with Id '${id}' not found.`});
+    }
+    res.status(200).json({message:"Lead deleted successfully."});
+  } catch (error) {
+    res.status(500).json({error:error.message});
   }
 });
 
