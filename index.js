@@ -225,7 +225,7 @@ app.put("/leads/:id", async (req, res) => {
 
     const updatedLead = await updateLead(req.params.id, req.body);
 
-    if (id || !updatedLead) {
+    if (id && !updatedLead) {
       return res.status(404).json({ error: `Lead with ID '${id}' not found.` });
     }
 
@@ -268,7 +268,7 @@ app.delete("/leads/:id", async (req, res) => {
       return res.status(400).json({error:"Invalid Lead Id."});
     }
     const leadDeleted = await deleteLead(req.params.id);
-    if (id || !leadDeleted) {
+    if (id && !leadDeleted) {
       return res.status(404).json({error:`Lead with Id '${id}' not found.`});
     }
     res.status(200).json({message:"Lead deleted successfully."});
