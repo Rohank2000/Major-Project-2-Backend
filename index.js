@@ -167,9 +167,7 @@ app.get("/leads", async (req, res) => {
         .json({ message: "No leads found matching the criteria." });
     }
 
-    res
-      .status(200)
-      .json({ message: "Leads fetched successfully.", leads: lead });
+    res.status(200).json({ message: "Leads fetched successfully.", lead });
   } catch (error) {
     // Catch unrecognized keys
     if (error.name === "StrictModeError") {
@@ -262,18 +260,54 @@ const deleteLead = async (leadId) => {
 
 app.delete("/leads/:id", async (req, res) => {
   try {
-    const {id} = req.params;
+    const { id } = req.params;
 
     if (id && !mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({error:"Invalid Lead Id."});
+      return res.status(400).json({ error: "Invalid Lead Id." });
     }
     const leadDeleted = await deleteLead(req.params.id);
     if (id && !leadDeleted) {
-      return res.status(404).json({error:`Lead with Id '${id}' not found.`});
+      return res.status(404).json({ error: `Lead with Id '${id}' not found.` });
     }
-    res.status(200).json({message:"Lead deleted successfully."});
+    res.status(200).json({ message: "Lead deleted successfully." });
   } catch (error) {
-    res.status(500).json({error:error.message});
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Create Comments using mongoose
+
+const createComment = async (commentData) => {
+  try {
+    const comment = new commentModel(commentData);
+    return await comment.save();
+  } catch (error) {
+    console.error("error", error.message);
+    throw error;
+  }
+};
+
+// Create Comments using express api
+
+app.post("/leads/:id/comments", async (req, res) => {
+  try {
+    if (id && !mongoose.Types.ObjectId.isValid(id)) {
+      return res
+        .status(400)
+        .json({ error: `Lead with Id '${id}' is not valid Object Id.` });
+    }
+    const newComment = await createComment(req.body);
+    if (id && !newComment) {
+      return res.status(404).json({ error: `Lead with Id '${id}' not found.` });
+    }
+    res
+      .status(201)
+      .json({ message: "Comment created successfully.", newComment });
+  } catch (error) {
+    if (error.name === "ValidationError") {
+      res.status(400).json({ error: error.message });
+    }
+    res.status(500).json({ error: error.message });
   }
 });
 
