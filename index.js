@@ -291,6 +291,8 @@ const createComment = async (commentData) => {
 
 app.post("/leads/:id/comments", async (req, res) => {
   try {
+    const {id} = req.params.id;
+
     if (id && !mongoose.Types.ObjectId.isValid(id)) {
       return res
         .status(400)
