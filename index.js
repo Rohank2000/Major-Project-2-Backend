@@ -346,7 +346,7 @@ app.get("/leads/:id/comments", async (req, res) => {
   }
 });
 
-// Create Tags using mongoose
+// Create Tag using mongoose
 
 const createTag = async (tagData)=>{
   try {
@@ -358,7 +358,7 @@ const createTag = async (tagData)=>{
   }
 }
 
-// Create tags using express api
+// Create tag using express api
 
 app.post("/tags", async (req,res)=>{
 try {
@@ -374,6 +374,30 @@ if (error.name==="ValidationError") {
   return res.status(409).json({error:error.message});
 }
 res.status(500).json({error:error.message});
+}
+});
+
+// get tags using mongoose
+
+const getTags = async ()=>{
+  try {
+    return await tagModel.find();
+  } catch (error) {
+    console.error("error",error.message);
+  }
+}
+
+// get tags using express api
+
+app.get("/tags", async (req,res)=>{
+try {
+  const tag = await getTags();
+  if (!tag) {
+    return res.status(404).json({error:"Tags not found."});
+  } 
+  res.status(200).json({message:"Tags Fetched Successfully.", tag});
+} catch (error) {
+  res.status(500).json({error:error.message});
 }
 });
 
