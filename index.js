@@ -291,14 +291,14 @@ const createComment = async (commentData) => {
 
 app.post("/leads/:id/comments", async (req, res) => {
   try {
-    const {id} = req.params.id;
+    const {id} = req.params;
 
     if (id && !mongoose.Types.ObjectId.isValid(id)) {
       return res
         .status(400)
         .json({ error: `Lead with Id '${id}' is not valid Object Id.` });
     }
-    const newComment = await createComment(req.params.id, req.body);
+    const newComment = await createComment(req.body);
     if (id && !newComment) {
       return res.status(404).json({ error: `Lead with Id '${id}' not found.` });
     }
@@ -307,7 +307,7 @@ app.post("/leads/:id/comments", async (req, res) => {
       .json({ message: "Comment created successfully.", newComment });
   } catch (error) {
     if (error.name === "ValidationError") {
-      res.status(400).json({ error: error.message });
+      return res.status(400).json({ error: error.message });
     }
     res.status(500).json({ error: error.message });
   }
