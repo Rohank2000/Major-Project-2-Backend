@@ -296,7 +296,7 @@ app.post("/leads/:id/comments", async (req, res) => {
         .status(400)
         .json({ error: `Lead with Id '${id}' is not valid Object Id.` });
     }
-    const newComment = await createComment(req.body);
+    const newComment = await createComment(req.params.id, req.body);
     if (id && !newComment) {
       return res.status(404).json({ error: `Lead with Id '${id}' not found.` });
     }
