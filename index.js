@@ -346,6 +346,37 @@ app.get("/leads/:id/comments", async (req, res) => {
   }
 });
 
+// Create Tags using mongoose
+
+const createTag = async (tagData)=>{
+  try {
+    const tag = new tagModel(tagData);
+    return await tag.save();
+  } catch (error) {
+    console.error("error",error.message);
+    throw error;
+  }
+}
+
+// Create tags using express api
+
+app.post("/tags", async (req,res)=>{
+try {
+  const newtag = await createTag(req.body);
+  if (!newtag) {
+    return res.status(400).json({error:"Error Occured While Creating New tag."});
+  }
+  res.status(201).json({message:"Tag Created Successfully.", newtag});
+} catch (error) {
+if (error.name==="ValidationError") {
+  return res.status(400).json({error:error.message});
+}  else if (error.code===11000){
+  return res.status(409).json({error:error.message});
+}
+res.status(500).json({error:error.message});
+}
+});
+
 // adding Sales Agent Data through Mongoose
 
 const createSalesAgent = async (salesAgentData) => {
