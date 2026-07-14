@@ -51,9 +51,31 @@ const leadSchema = new mongoose.Schema(
 },
 { strictQuery: 'throw' });
 
-// Middleware to update the `updatedAt` field on each save
+// Middleware to update `updatedAt` and `closedAt` on each save
 leadSchema.pre('save', function () {
   this.updatedAt = Date.now();
+  if (this.status === 'Closed' && !this.closedAt) {
+    this.closedAt = Date.now();
+  } else if (this.status !== 'Closed') {
+    this.closedAt = undefined;
+  }
 });
+
+// Middleware to handle `closedAt` on findOneAndUpdate(findByIdAndUpdate)
+
+leadSchema.pre('findOneAndUpdate', function () {
+  const update = this.getUpdate();
+  const status = update.status || (update.$set && update.$set.status);
+  this.set({updatedAt:Date.now()});
+if (status==='Closed') {
+  if (!update.closedAt && !(update.$set && update.$set.closedAt)) {
+    this.set({closedAt:Date.now()});
+  }
+  this.closedAt = Date.now();
+} else if (status && status !== 'Closed') {
+  this.set({closedAt:null});
+  }
+  } 
+);
 
 module.exports = mongoose.model('Lead', leadSchema);

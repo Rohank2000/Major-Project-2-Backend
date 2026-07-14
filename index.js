@@ -401,6 +401,32 @@ try {
 }
 });
 
+//Get Leads Closed Last Week using mongoose
+
+const getLeadsClosedLastWeek = async ()=>{
+try {
+  const oneWeekAgo = new Date(Date.now()-7*24*60*60*1000);
+    return await leadModel.find({status: "Closed", closedAt:{$gte:oneWeekAgo}});
+} catch (error) {
+  console.error("error",error.message);
+  throw error;
+}
+}
+
+// Get Leads Closed Last Week using express api
+
+app.get("/report/last-week", async (req,res)=>{
+try {
+  const leadsClosedLastWeek = await getLeadsClosedLastWeek();
+  if (!leadsClosedLastWeek) {
+    return res.status(404).json({error:"No Lead Closed Since Last Week"});
+  }
+  res.status(200).json({message:"Successfully Fetched Leads Closed in the Last 7 Days.", leadsClosedLastWeek});
+} catch (error) {
+res.status(500).json({error:error.message});  
+}
+});
+
 // adding Sales Agent Data through Mongoose
 
 const createSalesAgent = async (salesAgentData) => {
