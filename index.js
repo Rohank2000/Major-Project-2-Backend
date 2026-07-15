@@ -432,7 +432,7 @@ res.status(500).json({error:error.message});
 const getTotalLeadsInPipeLine = async ()=>{
   try {
     return await leadModel.aggregate([
-{$match:{$ne:{status:'Closed'}}},
+{$match:{status:{$ne:'Closed'}}},
 {$group:{_id:"$status", count:{$sum:1}}},
 {$sort:{_id:1}},
 ]);
