@@ -429,9 +429,13 @@ res.status(500).json({error:error.message});
 
 // Get Total Leads in Pipeline using mongoose
 
-const getTotalLeadsInPublic = async ()=>{
+const getTotalLeadsInPipeLine = async ()=>{
   try {
-    return await leadModel.find({status:{$ne:'Closed'}});
+    return await leadModel.aggregate([
+{$match:{$ne:{status:'Closed'}}},
+{$group:{_id:"$status", count:{$sum:1}}},
+{$sort:{_id:1}},
+]);
   } catch (error) {
     console.error("error", error.message);
     throw error;
@@ -442,14 +446,65 @@ const getTotalLeadsInPublic = async ()=>{
 
 app.get("/report/pipeline", async (req,res)=>{
 try {
-  const getTotalLead = await getTotalLeadsInPublic();
-  const totalLeadsInPipeline = getTotalLead.length;
+  const getTotalLead = await getTotalLeadsInPipeLine();
+  const totalLeadsInPipeline = getTotalLead.reduce((acc,curr)=>
+acc + curr.count,0);
+  const byStatus = {};
+  totalLeadsInPipeline.forEach((item)=>{
+    byStatus[item._id]=item.count;
+  });
   if (!getTotalLead) {
     return res.status(404).json({error:"No Leads Found."});
   }
-  res.status(200).json({message:"Successfully Fetched total number of leads currently in the pipeline.", totalLeadsInPipeline});
+  res.status(200).json({message:"Successfully Fetched total number of leads currently in the pipeline.", totalLeadsInPipeline, byStatus});
 } catch (error) {
   res.status(500).json({error:error.message})
+}
+});
+
+// Get Number of Leads closed by each salesAgent using mongoose
+
+const getLeadsClosedByEachAgent = async ()=>{
+  try {
+    return await leadModel.aggregate([
+      {$match:{status:"Closed"}},
+      {$group:{_id:"$salesAgent",count:{$sum:1} }},
+      {
+        $lookup:{
+          from:"salesagents",
+          localField:"_id",
+          foreignField:"_id",
+          as:"agent",
+        },
+      },
+      {$unwind:"$agent"},
+      {
+        $project:{
+          _id:0,
+          agentId:"$agent._id",
+          agentName:"$agent.name",
+          agentEmail:"$agent.email",
+          closedLeads:"$count",
+        },
+      },
+      {$sort:{closedLeads:-1}},
+    ]);
+  } catch (error) {
+    console.error("error",error.message);
+  }
+}
+
+// Get Number of Leads closed by each salesAgent express api
+
+app.get("/report/closed-by-agent", async (req,res)=>{
+try {
+  const closedLeadsByAgent = await getLeadsClosedByEachAgent();
+  if (!closedLeadsByAgent) {
+    return res.status(404).json({error:"No 'Closed' Status found."});
+  } 
+  res.status(200).json({message:"Successfully fetched leads closed by each sales agent.", closedLeadsByAgent});
+} catch (error) {
+  res.status(500).json({error:error.message});
 }
 });
 
