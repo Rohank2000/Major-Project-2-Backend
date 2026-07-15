@@ -427,6 +427,32 @@ res.status(500).json({error:error.message});
 }
 });
 
+// Get Total Leads in Pipeline using mongoose
+
+const getTotalLeadsInPublic = async ()=>{
+  try {
+    return await leadModel.find({status:{$ne:'Closed'}});
+  } catch (error) {
+    console.error("error", error.message);
+    throw error;
+  }
+}
+
+// Get Total Leads in Pipeline express api 
+
+app.get("/report/pipeline", async (req,res)=>{
+try {
+  const getTotalLead = await getTotalLeadsInPublic();
+  const totalLeadsInPipeline = getTotalLead.length;
+  if (!getTotalLead) {
+    return res.status(404).json({error:"No Leads Found."});
+  }
+  res.status(200).json({message:"Successfully Fetched total number of leads currently in the pipeline.", totalLeadsInPipeline});
+} catch (error) {
+  res.status(500).json({error:error.message})
+}
+});
+
 // adding Sales Agent Data through Mongoose
 
 const createSalesAgent = async (salesAgentData) => {
