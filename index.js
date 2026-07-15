@@ -450,7 +450,7 @@ try {
   const totalLeadsInPipeline = getTotalLead.reduce((acc,curr)=>
 acc + curr.count,0);
   const byStatus = {};
-  totalLeadsInPipeline.forEach((item)=>{
+  getTotalLead.forEach((item)=>{
     byStatus[item._id]=item.count;
   });
   if (!getTotalLead) {
