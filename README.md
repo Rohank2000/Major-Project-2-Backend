@@ -9,9 +9,9 @@ A Node.js/Express REST API for managing sales leads, with reporting endpoints. B
 - Database: MongoDB Atlas
 
 # Getting Started
-cp .env .env.local   
-npm install
-npm run dev           # requires nodemon, or node index.js
+'cp' '.env' '.env.local'   
+'npm install'
+'npm run dev'           # requires nodemon, or node index.js
 
 Server starts on http://localhost:3000.
 
