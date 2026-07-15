@@ -1,6 +1,6 @@
 # Major Project 2 Backend
 
-A Node.js/Express REST API for managing sales leads, with reporting endpoints. Built with MongoDB (Mongoose).
+A Node.js/Express REST API for managing sales leads,sales Agent Details, comments and tags with reporting endpoints. Built with MongoDB (Mongoose).
 
 ## Tech Stack
 
