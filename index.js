@@ -317,7 +317,7 @@ app.post("/leads/:id/comments", async (req, res) => {
 
 const getAllComments = async (leadId) => {
   try {
-    return await commentModel.find({lead:leadId});
+    return await commentModel.find({lead:leadId}).populate("author");
   } catch (error) {
     console.error("error", error.message);
   }
