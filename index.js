@@ -332,11 +332,11 @@ app.get("/leads/:id/comments", async (req, res) => {
     if (id && !mongoose.Types.ObjectId.isValid(id)) {
       return res
         .status(400)
-        .json({ error: "Lead With Id '${id}' not a valid Object Id." });
+        .json({ error: `Lead With Id '${id}' not a valid Object Id.` });
     }
     const comments = await getAllComments(id);
     if (id && !comments) {
-      return res.status(404).json({ error: "Lead with Id '${id}' not found." });
+      return res.status(404).json({ error: `Lead with Id '${id}' not found.` });
     }
     res
       .status(200)
