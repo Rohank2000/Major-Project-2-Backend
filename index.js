@@ -153,7 +153,7 @@ app.get("/leads", async (req, res) => {
 
     if (salesAgent && !mongoose.Types.ObjectId.isValid(salesAgent)) {
       return res.status(400).json({
-        error: "Invalid input: 'salesAgent' must be a valid MongoDB ObjectId.",
+        error: "Invalid input: 'salesAgent' must be a valid MongoDB ObjectId",
       });
     }
 
@@ -164,10 +164,10 @@ app.get("/leads", async (req, res) => {
     if (!lead || lead.length === 0) {
       return res
         .status(404)
-        .json({ message: "No leads found matching the criteria." });
+        .json({ message: "No leads found matching the criteria" });
     }
 
-    res.status(200).json({ message: "Leads fetched successfully.", lead });
+    res.status(200).json({ message: "Leads fetched successfully", lead });
   } catch (error) {
     // Catch unrecognized keys
     if (error.name === "StrictModeError") {
@@ -201,7 +201,7 @@ app.put("/leads/:id", async (req, res) => {
     const { id } = req.params;
 
     if (id && !mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ error: "Invalid Lead Id." });
+      return res.status(400).json({ error: "Invalid Lead Id" });
     }
 
     const { salesAgent } = req.body;
@@ -209,7 +209,7 @@ app.put("/leads/:id", async (req, res) => {
     if (salesAgent && !mongoose.Types.ObjectId.isValid(salesAgent)) {
       return res
         .status(400)
-        .json({ error: "'salesAgent' must be a valid MongoDB ObjectId." });
+        .json({ error: "'salesAgent' must be a valid MongoDB ObjectId" });
     }
 
     if (salesAgent) {
@@ -217,17 +217,17 @@ app.put("/leads/:id", async (req, res) => {
       if (!agent) {
         return res
           .status(404)
-          .json({ error: `sales Agent with Id ${salesAgent} not found.` });
+          .json({ error: `sales Agent with Id ${salesAgent} not found` });
       }
     }
 
     const updatedLead = await updateLead(req.params.id, req.body);
 
     if (id && !updatedLead) {
-      return res.status(404).json({ error: `Lead with ID '${id}' not found.` });
+      return res.status(404).json({ error: `Lead with ID '${id}' not found` });
     }
 
-    res.status(200).json({ message: "Lead Updated Succesfully.", updatedLead });
+    res.status(200).json({ message: "Lead Updated Succesfully", updatedLead });
   } catch (error) {
     if (error.name === "ValidationError") {
       const messages = Object.values(error.errors).map((er) => {
@@ -263,13 +263,13 @@ app.delete("/leads/:id", async (req, res) => {
     const { id } = req.params;
 
     if (id && !mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ error: "Invalid Lead Id." });
+      return res.status(400).json({ error: "Invalid Lead Id" });
     }
     const leadDeleted = await deleteLead(req.params.id);
     if (id && !leadDeleted) {
-      return res.status(404).json({ error: `Lead with Id '${id}' not found.` });
+      return res.status(404).json({ error: `Lead with Id '${id}' not found` });
     }
-    res.status(200).json({ message: "Lead deleted successfully." });
+    res.status(200).json({ message: "Lead deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -296,15 +296,15 @@ app.post("/leads/:id/comments", async (req, res) => {
     if (id && !mongoose.Types.ObjectId.isValid(id)) {
       return res
         .status(400)
-        .json({ error: `Lead with Id '${id}' is not valid Object Id.` });
+        .json({ error: `Lead with Id '${id}' is not valid Object Id` });
     }
     const newComment = await createComment(req.body);
     if (id && !newComment) {
-      return res.status(404).json({ error: `Lead with Id '${id}' not found.` });
+      return res.status(404).json({ error: `Lead with Id '${id}' not found` });
     }
     res
       .status(201)
-      .json({ message: "Comment created successfully.", newComment });
+      .json({ message: "Comment created successfully", newComment });
   } catch (error) {
     if (error.name === "ValidationError") {
       return res.status(400).json({ error: error.message });
@@ -332,15 +332,15 @@ app.get("/leads/:id/comments", async (req, res) => {
     if (id && !mongoose.Types.ObjectId.isValid(id)) {
       return res
         .status(400)
-        .json({ error: `Lead With Id '${id}' not a valid Object Id.` });
+        .json({ error: `Lead With Id '${id}' not a valid Object Id` });
     }
     const comments = await getAllComments(id);
     if (id && !comments) {
-      return res.status(404).json({ error: `Lead with Id '${id}' not found.` });
+      return res.status(404).json({ error: `Lead with Id '${id}' not found` });
     }
     res
       .status(200)
-      .json({ message: "Comments fetched successfully.", comments });
+      .json({ message: "Comments fetched successfully", comments });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -364,9 +364,9 @@ app.post("/tags", async (req,res)=>{
 try {
   const newtag = await createTag(req.body);
   if (!newtag) {
-    return res.status(400).json({error:"Error Occured While Creating New tag."});
+    return res.status(400).json({error:"Error Occured While Creating New tag"});
   }
-  res.status(201).json({message:"Tag Created Successfully.", newtag});
+  res.status(201).json({message:"Tag Created Successfully", newtag});
 } catch (error) {
 if (error.name==="ValidationError") {
   return res.status(400).json({error:error.message});
@@ -393,9 +393,9 @@ app.get("/tags", async (req,res)=>{
 try {
   const tag = await getTags();
   if (!tag) {
-    return res.status(404).json({error:"Tags not found."});
+    return res.status(404).json({error:"Tags not found"});
   } 
-  res.status(200).json({message:"Tags Fetched Successfully.", tag});
+  res.status(200).json({message:"Tags Fetched Successfully", tag});
 } catch (error) {
   res.status(500).json({error:error.message});
 }
@@ -421,7 +421,7 @@ try {
   if (!leadsClosedLastWeek) {
     return res.status(404).json({error:"No Lead Closed Since Last Week"});
   }
-  res.status(200).json({message:"Successfully Fetched Leads Closed in the Last 7 Days.", leadsClosedLastWeek});
+  res.status(200).json({message:"Successfully Fetched Leads Closed in the Last 7 Days", leadsClosedLastWeek});
 } catch (error) {
 res.status(500).json({error:error.message});  
 }
@@ -454,9 +454,9 @@ acc + curr.count,0);
     byStatus[item._id]=item.count;
   });
   if (!getTotalLead) {
-    return res.status(404).json({error:"No Leads Found."});
+    return res.status(404).json({error:"No Leads Found"});
   }
-  res.status(200).json({message:"Successfully Fetched total number of leads currently in the pipeline.", totalLeadsInPipeline, byStatus});
+  res.status(200).json({message:"Successfully Fetched total number of leads currently in the pipeline", totalLeadsInPipeline, byStatus});
 } catch (error) {
   res.status(500).json({error:error.message})
 }
@@ -500,9 +500,9 @@ app.get("/report/closed-by-agent", async (req,res)=>{
 try {
   const closedLeadsByAgent = await getLeadsClosedByEachAgent();
   if (!closedLeadsByAgent) {
-    return res.status(404).json({error:"No 'Closed' Status found."});
+    return res.status(404).json({error:"No 'Closed' Status found"});
   } 
-  res.status(200).json({message:"Successfully fetched leads closed by each sales agent.", closedLeadsByAgent});
+  res.status(200).json({message:"Successfully fetched leads closed by each sales agent", closedLeadsByAgent});
 } catch (error) {
   res.status(500).json({error:error.message});
 }
@@ -537,7 +537,7 @@ app.post("/agents", async (req, res) => {
       res.status(400).json({ error: `Invalid input: ${messages.join(", ")}` });
     } else if (err.code === 11000) {
       res.status(409).json({
-        error: `Sales agent with email '${req.body.email}' already exists.`,
+        error: `Sales agent with email '${req.body.email}' already exists`,
       });
     } else {
       res.status(500).json({ error: err.message });
@@ -563,10 +563,10 @@ app.get("/agents", async (req, res) => {
   try {
     const allAgents = await getAllAgents();
     if (!allAgents || allAgents.length === 0) {
-      return res.status(404).json({ message: "Sales agent Data not found." });
+      return res.status(404).json({ message: "Sales agent Data not found" });
     }
     res.status(200).json({
-      message: "All Sales Agent Data Successfully Fetched.",
+      message: "All Sales Agent Data Successfully Fetched",
       allAgents,
     });
   } catch (error) {
