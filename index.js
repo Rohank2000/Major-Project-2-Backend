@@ -56,7 +56,7 @@ app.post("/leads", async (req, res) => {
       if (!agent) {
         return res
           .status(404)
-          .json({ error: `Sales agent with ID '${salesAgent}' not found.` });
+          .json({ error: `Sales agent with ID '${salesAgent}' not found` });
       }
     }
 
@@ -528,7 +528,7 @@ app.post("/agents", async (req, res) => {
     const createdAgent = await createSalesAgent(req.body);
     res
       .status(201)
-      .json({ message: "New Sales Agent Data Added.", createdAgent });
+      .json({ message: "New Sales Agent Data Added", createdAgent });
   } catch (err) {
     if (err.name === "ValidationError") {
       const messages = Object.values(err.errors).map(
