@@ -1,4 +1,7 @@
-# Major Project 2 Backend
+
+
+
+#  Prospecta CRM Backend
 
 A Node.js/Express REST API for managing sales leads,sales Agent Details, comments and tags with reporting endpoints. Built with MongoDB (Mongoose).
 
@@ -29,6 +32,10 @@ npm run dev           # requires nodemon, or node index.js
 ```
 
 Server starts on `http://localhost:3000`.
+
+## Deployed Backend Link
+
+<a href="https://prospectaapi.vercel.app/">Link</a>
 
 ## API Endpoints
 
