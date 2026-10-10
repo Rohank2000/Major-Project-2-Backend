@@ -4,10 +4,20 @@ A Node.js/Express REST API for managing sales leads,sales Agent Details, comment
 
 ## Tech Stack
 
+### Core
+
 - **Runtime:** Node.js (CommonJS)
 - **Framework:** Express 5
 - **ODM:** Mongoose 9
 - **Database:** MongoDB Atlas
+
+### Middleware
+
+- **CORS:** `cors` — enables Cross-Origin Resource Sharing so the frontend (different origin/port) can call this API
+
+### Configuration
+
+- **Environment Variables:** `dotenv` — loads `.env` config (e.g. `dbConnectionString`, `PORT`) into `process.env`
 
 ## Getting Started
 
