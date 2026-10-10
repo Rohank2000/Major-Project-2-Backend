@@ -1,7 +1,7 @@
 
 
 
-#  Prospecta CRM Backend
+#  Prospecta CRM Backend API
 
 A Node.js/Express REST API for managing sales leads,sales Agent Details, comments and tags with reporting endpoints. Built with MongoDB (Mongoose).
 
