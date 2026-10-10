@@ -33,9 +33,9 @@ npm run dev           # requires nodemon, or node index.js
 
 Server starts on `http://localhost:3000`.
 
-## Deployed Backend Link
+## Live Deployed Link
 
-<a href="https://prospectaapi.vercel.app/">Link</a>
+<a href="https://prospectaapi.vercel.app/">Live Link</a>
 
 ## API Endpoints
 
